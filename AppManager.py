@@ -25,9 +25,10 @@ class TicTacToeApp:
         self.thread.start()
         self.root.wm_title("TicTacToe OpenCV")
         self.root.protocol("WM_DELETE_WINDOW", self.onClose)
+        self.edge_detection = False
 
     def computer_turn(self):
-        pass
+        self.edge_detection = ~self.edge_detection
 
     def videoLoop(self):
         try:
@@ -39,8 +40,9 @@ class TicTacToeApp:
                 # OpenCV represents images in BGR order transformation to RGB in PIL is required
                 image = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
                 image = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
-                image = Image.fromarray(image)
-                image = ImageTk.PhotoImage(image=image)
+                if self.edge_detection:
+                    image = cv.Canny(image, 100, 200)
+                image = ImageTk.PhotoImage(image=Image.fromarray(image))
 
                 if self.panel is None:
                     self.panel = tk.Label(image=image)
