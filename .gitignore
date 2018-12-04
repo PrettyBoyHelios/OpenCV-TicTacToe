@@ -67,3 +67,6 @@ fabric.properties
 
 .DS_Store
 *.pth
+*.pyc
+*.xml
+*.iml

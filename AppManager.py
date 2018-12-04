@@ -25,22 +25,28 @@ class TicTacToeApp:
         self.thread.start()
         self.root.wm_title("TicTacToe OpenCV")
         self.root.protocol("WM_DELETE_WINDOW", self.onClose)
+        self.edge_detection = False
 
     def computer_turn(self):
-        pass
+        self.edge_detection = ~self.edge_detection
 
     def videoLoop(self):
         try:
             # keep looping over frames until we are instructed to stop
             while not self.stopEvent.is_set():
                 ret, self.frame = self.vs.read()
-                self.frame = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR)
+                self.frame = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
 
                 # OpenCV represents images in BGR order transformation to RGB in PIL is required
-                image = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
-                image = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
-                image = Image.fromarray(image)
-                image = ImageTk.PhotoImage(image=image)
+                image = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
+                #ret, thresh = cv.threshold(image, 127, 255, 0)
+                #im2, contours, hierarchy = cv.findContours(thresh, 1, 2)
+                #box = cv.boxPoints(cv.minAreaRect(contours))
+                #box = np.int0(box)
+                #image = cv.drawContours(image, [box], 0, (0, 0, 255), 2)
+                if self.edge_detection:
+                    image = cv.Canny(image, 100, 200)
+                image = ImageTk.PhotoImage(image=Image.fromarray(image))
 
                 if self.panel is None:
                     self.panel = tk.Label(image=image)
