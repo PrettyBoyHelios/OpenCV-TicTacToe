@@ -4,6 +4,8 @@ import cv2 as cv
 import tkinter as tk
 import threading
 from PIL import Image, ImageTk
+import traceback
+import datetime
 
 
 class TicTacToeApp:
@@ -29,6 +31,8 @@ class TicTacToeApp:
 
     def computer_turn(self):
         self.edge_detection = ~self.edge_detection
+        self.process_image()
+
 
     def videoLoop(self):
         try:
@@ -36,17 +40,10 @@ class TicTacToeApp:
             while not self.stopEvent.is_set():
                 ret, self.frame = self.vs.read()
                 self.frame = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-
+                self.frame = cv.cvtColor(self.frame,cv.COLOR_BGR2RGB)
                 # OpenCV represents images in BGR order transformation to RGB in PIL is required
-                image = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
-                #ret, thresh = cv.threshold(image, 127, 255, 0)
-                #im2, contours, hierarchy = cv.findContours(thresh, 1, 2)
-                #box = cv.boxPoints(cv.minAreaRect(contours))
-                #box = np.int0(box)
-                #image = cv.drawContours(image, [box], 0, (0, 0, 255), 2)
-                if self.edge_detection:
-                    image = cv.Canny(image, 100, 200)
-                image = ImageTk.PhotoImage(image=Image.fromarray(image))
+
+                image = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
 
                 if self.panel is None:
                     self.panel = tk.Label(image=image)
@@ -58,10 +55,27 @@ class TicTacToeApp:
 
         except Exception as e:
             print("[INFO] caught a RuntimeError")
-            print(e.with_traceback())
+            print(e)
+            traceback.print_exc()
 
     def onClose(self):
         print("[INFO] closing...")
         self.stopEvent.set()
         self.vs.release()
+        cv.destroyAllWindows()
         self.root.destroy()
+
+    def process_image(self):
+        image = self.frame
+        imggray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        normalizedImg = cv.normalize(image, 0, 255, cv.NORM_MINMAX)
+        image = normalizedImg
+
+        ret, tresh = cv.threshold(imggray, 200, 255, cv.THRESH_BINARY)
+        cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", tresh)
+        im2, contours, hierarchy = cv.findContours(tresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        cnt = contours[0]
+        print(contours)
+        x, y, w, h = cv.boundingRect(cnt)
+        cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
