@@ -41,7 +41,30 @@ def getColor(color, image, ignore_after):
     cv.imshow("Opening Result", opening)
 
 
+def generateTicTacToe(img):
+    ttt = np.chararray((3, 3))
+    ttt[:] = 'a'
+    saw_white = False
 
+    for i in range(0, 3):
+        for j in range(0, 3):
+            cross = 0
+            r = 213 * i + 106
+            for c in range(120 * j, 120 * (j + 1)):
+                if img[r, c] == 1 and not saw_white:
+                    cross += 1
+                    saw_white = True
+                elif img[r, c] == 0:
+                    saw_white = False
+
+            if cross == 1:
+                ttt[i, j] = b'x'
+            elif cross == 2:
+                ttt[i, j] = b'o'
+            else:
+                ttt[i, j] = b'a'
+
+    return ttt
 
 
 image = cv.imread("data/test_multiple.jpg", cv.IMREAD_COLOR)
