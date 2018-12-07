@@ -69,7 +69,7 @@ class TicTacToeApp:
     def process_image(self):
         image = self.frame
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('red', image, 70, True)
+        image = Utils.getColor('blue', image, 70, False)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
 
     def preprocessimage(self, image):
