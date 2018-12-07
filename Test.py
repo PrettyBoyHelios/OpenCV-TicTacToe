@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np
 from AppManager import TicTacToeApp
 from PIL import Image, ImageTk
+import Utils
 
 np.set_printoptions(threshold=np.inf)
 
@@ -42,37 +43,14 @@ def getColor(color, image, ignore_after):
     cv.imshow("Opening Result", opening)
 
 
-def generateTicTacToe(img):
-    ttt = np.chararray((3, 3))
-    ttt[:] = 'a'
-    saw_white = False
-    print(img.shape)
-    for i in range(0, 3):
-        for j in range(0, 3):
-            cross = 0
-            saw_white = False
-            r = 120 * i + 60
-            for c in range(213 * j, 213 * (j + 1)):
-                print(r, c, saw_white)
-                if img[r, c] == 1 and not saw_white:
-                    cross += 1
-                    saw_white = True
-                elif img[r, c] == 0:
-                    saw_white = False
-
-            if cross == 1:
-                ttt[i, j] = b'x'
-            elif cross == 2:
-                ttt[i, j] = b'o'
-            else:
-                ttt[i, j] = b'a'
-
-    print(ttt)
-
-
 image = cv.imread("data/test_grid.jpg", cv.IMREAD_COLOR)
 image = cv.resize(image, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-getColor('red', image, 70)
+image = Utils.getColor('red', image, 70, False)
+#print(image)
+cv.imshow("cosa", image)
+cv.imwrite("images/test_grid.png", image)
+Utils.generateTicTacToe(image)
+
 # image_r = cv.cvtColor(image_r, cv.COLOR_RGB2GRAY)
 #
 # ret, image_r = cv.threshold(image_r, 120, 255, cv.THRESH_BINARY)
