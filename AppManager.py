@@ -6,6 +6,7 @@ import threading
 from PIL import Image, ImageTk
 import traceback
 import datetime
+import Utils
 
 
 class TicTacToeApp:
@@ -40,7 +41,7 @@ class TicTacToeApp:
             while not self.stopEvent.is_set():
                 ret, self.frame = self.vs.read()
                 self.frame = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-                self.frame = cv.cvtColor(self.frame,cv.COLOR_BGR2RGB)
+                self.frame = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
                 # OpenCV represents images in BGR order transformation to RGB in PIL is required
 
                 image = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
@@ -67,15 +68,10 @@ class TicTacToeApp:
 
     def process_image(self):
         image = self.frame
-        imggray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        normalizedImg = cv.normalize(image, 0, 255, cv.NORM_MINMAX)
-        image = normalizedImg
-
-        ret, tresh = cv.threshold(imggray, 200, 255, cv.THRESH_BINARY)
-        cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", tresh)
-        im2, contours, hierarchy = cv.findContours(tresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
-        cnt = contours[0]
-        print(contours)
-        x, y, w, h = cv.boundingRect(cnt)
-        cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+        image = Utils.getColor('red', image, 70)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
+
+    def preprocessimage(self, image):
+
+        return image
