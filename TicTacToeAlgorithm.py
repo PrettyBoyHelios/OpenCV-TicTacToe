@@ -46,7 +46,7 @@ def evaluate_position(t):
 
 def dfs(ttt, level, move):
 
-    if level == 3:
+    if level == 4:
         return 0
 
     ev = evaluate_position(ttt)
