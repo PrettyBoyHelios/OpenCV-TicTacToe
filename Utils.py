@@ -33,13 +33,14 @@ def getColor(color, image, ignore_after, open_image):
 
     if open_image:
         # Structuring Element, cross at 45°
-        mask_size = 110
+        mask_size = 40
         mask = cv.getStructuringElement(cv.MORPH_CROSS, (mask_size, mask_size))
+        print(mask)
         rows, cols = mask.shape
-        rot = cv.getRotationMatrix2D((cols/2, rows/10), 45, 1)
+        rot = cv.getRotationMatrix2D((cols/2, rows/2), 45, 1)
 
         dst = cv.warpAffine(mask, rot, mask.shape)
-        #print(dst)
+        print(dst)
         # Open Image
         image = cv.morphologyEx(image, cv.MORPH_OPEN, mask)
         #cv.imshow("Opening Result", image)

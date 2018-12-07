@@ -34,6 +34,9 @@ class TicTacToeApp:
         self.edge_detection = ~self.edge_detection
         self.process_image()
 
+    def setConfig(self, config):
+        self.usePattern = config['pattern']
+
 
     def videoLoop(self):
         try:
