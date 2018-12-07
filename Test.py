@@ -11,7 +11,7 @@ def getColor(color, image, ignore_after):
     image = cv.medianBlur(image, 9)
     cv.imshow("Original", image)
     image_r = image
-    print(image_r.shape)
+    #print(image_r.shape)
     for i in range(640):
         for j in range(360):
             n = np.argmax(image_r[j, i])
@@ -22,23 +22,23 @@ def getColor(color, image, ignore_after):
     image_r[:, :, 0:2] = 0
     ##cv.imshow("pROCESSED", image_r)
     imgray = cv.cvtColor(image_r, cv.COLOR_BGR2GRAY)
-    print(imgray.shape, "imgray")
+    #print(imgray.shape, "imgray")
     cv.imshow("Gray", imgray)
     ret, image = cv.threshold(imgray, ignore_after, 255, cv.THRESH_BINARY)
     #th2 = cv.adaptiveThreshold(imgray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 11, 2)
     # print(th2.shape)
     # cv.imshow("TH2", th2)
-    print(image_r)
+    #print(image_r)
     cv.imshow("RedFilter", image)
     mask_size = 110
     img = cv.getStructuringElement(cv.MORPH_CROSS, (mask_size, mask_size))
     rows, cols = img.shape
     rot = cv.getRotationMatrix2D((cols/2, rows/10), 45, 1)
-    print(img)
+    #print(img)
     dst = None
     dst = cv.warpAffine(img, rot, img.shape)
     opening = cv.morphologyEx(image, cv.MORPH_OPEN, img)
-    print(opening)
+    #print(opening)
     cv.imshow("Opening Result", opening)
 
 
@@ -46,12 +46,14 @@ def generateTicTacToe(img):
     ttt = np.chararray((3, 3))
     ttt[:] = 'a'
     saw_white = False
-
+    print(img.shape)
     for i in range(0, 3):
         for j in range(0, 3):
             cross = 0
-            r = 213 * i + 106
-            for c in range(120 * j, 120 * (j + 1)):
+            saw_white = False
+            r = 120 * i + 60
+            for c in range(213 * j, 213 * (j + 1)):
+                print(r, c, saw_white)
                 if img[r, c] == 1 and not saw_white:
                     cross += 1
                     saw_white = True
@@ -65,10 +67,10 @@ def generateTicTacToe(img):
             else:
                 ttt[i, j] = b'a'
 
-    return ttt
+    print(ttt)
 
 
-image = cv.imread("data/test_multiple.jpg", cv.IMREAD_COLOR)
+image = cv.imread("data/test_grid.jpg", cv.IMREAD_COLOR)
 image = cv.resize(image, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
 getColor('red', image, 70)
 # image_r = cv.cvtColor(image_r, cv.COLOR_RGB2GRAY)
