@@ -6,24 +6,27 @@ from PIL import Image, ImageTk
 import Utils
 
 
-# Image To grid representation Test
-image = cv.imread("data/test_grid.jpg", cv.IMREAD_COLOR)
-image = cv.resize(image, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-image = Utils.getColor('red', image, 70, False)
-#print(image)
-cv.imshow("cosa", image)
-cv.imwrite("images/test_grid.png", image)
-Utils.generateTicTacToe(image)
+# # Image To grid representation Test
+# image = cv.imread("data/test_grid.jpg", cv.IMREAD_COLOR)
+# image = cv.resize(image, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
+# image = Utils.getColor('red', image, 70, False)
+# #print(image)
+# cv.imshow("cosa", image)
+# cv.imwrite("images/test_grid.png", image)
+# Utils.generateTicTacToe(image)
 
 
 # getColor Testing
 
-np.set_printoptions(threshold=np.inf)
+#np.set_printoptions(threshold=np.inf)
+debug = True
 
-
-image = cv.imread("data/test_grid.jpg", cv.IMREAD_COLOR)
+image = cv.imread("data/test_perspective.jpg", cv.IMREAD_COLOR)
 image = cv.resize(image, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-image = getColor('red', image, 70, True)
+cv.imshow("Original", image)
+points = Utils.getTicTacBoard(image, debug=debug)
+print("Debug, points ", points)
+image = Utils.warpTicTacToe(image, points)
 cv.imshow("Result", image)
 cv.waitKey(0)
 cv.destroyAllWindows()

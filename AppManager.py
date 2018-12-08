@@ -10,13 +10,15 @@ import Utils
 
 
 class TicTacToeApp:
-    def __init__(self, vs, w, h):
+    def __init__(self, vs, w, h, debug=False):
         self.vs = vs
         self.h = h
         self.w = w
+        self.dbg = debug
         self.frame = None
         self.thread = None
         self.stopEvent = None
+        self.isSetUp = False
 
         self.root = tk.Tk()
         self.panel = None
@@ -31,8 +33,10 @@ class TicTacToeApp:
         self.edge_detection = False
 
     def computer_turn(self):
-        self.edge_detection = ~self.edge_detection
-        self.process_image()
+        if self.isSetUp:
+            self.process_image()
+        else:
+            self.coordinates = Utils.get
 
     def setConfig(self, config):
         self.usePattern = config['pattern']
@@ -72,7 +76,7 @@ class TicTacToeApp:
     def process_image(self):
         image = self.frame
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('blue', image, 70, False)
+        image = Utils.getColor('blue', image, 70, False, self.dbg)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
 
     def preprocessimage(self, image):
