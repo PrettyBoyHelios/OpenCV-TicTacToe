@@ -161,8 +161,7 @@ def getTicTacBoard(or_image, mask_size=10, debug=False):
         cv.imshow("getTicTacBoard::Labelled Image", labels) if debug else None
 
     points = getPoints(labels)
-
-    
+    print("Points at ", points)
     return points
 
 
@@ -171,7 +170,6 @@ def getPoints(or_image):
     for i in range(1, 5):
         indexes = np.argwhere(or_image == i)
         points.append(getPoint(indexes))
-    print(points)
     points = np.array(points)
     return points
 

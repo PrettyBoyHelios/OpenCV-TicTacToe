@@ -19,6 +19,7 @@ class TicTacToeApp:
         self.thread = None
         self.stopEvent = None
         self.isSetUp = False
+        self.coordinates = None
 
         self.root = tk.Tk()
         self.panel = None
@@ -36,7 +37,8 @@ class TicTacToeApp:
         if self.isSetUp:
             self.process_image()
         else:
-            self.coordinates = Utils.get
+            self.coordinates = Utils.getTicTacBoard(self.frame, debug=False)
+            self.isSetUp = True
 
     def setConfig(self, config):
         self.usePattern = config['pattern']
@@ -76,9 +78,10 @@ class TicTacToeApp:
     def process_image(self):
         image = self.frame
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('blue', image, 70, False, self.dbg)
+        image = Utils.getColor('red', image, 70, False, self.dbg)
+        image = Utils.warpTicTacToe(image, self.coordinates)
+        image = cv.resize(image, (300,300), interpolation=cv.INTER_LINEAR_EXACT)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
 
-    def preprocessimage(self, image):
+        ## Code for computer playing
 
-        return image
