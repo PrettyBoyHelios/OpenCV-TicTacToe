@@ -35,13 +35,13 @@ class TicTacToeApp:
 
     def computer_turn(self):
         if self.isSetUp:
-            self.process_image()
             player = Utils.Player()
             image = self.process_image()
+            image = Utils.warpTicTacToe(image, self.coordinates)
             r, c = player.next_move(image)
             print(r, c)
         else:
-            self.coordinates = Utils.getTicTacBoard(self.frame, debug=False)
+            self.coordinates = Utils.getTicTacBoard(self.frame, (140, 250), debug=False)
             self.isSetUp = True
 
     def setConfig(self, config):
