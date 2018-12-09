@@ -31,8 +31,11 @@ class TicTacToeApp:
         self.edge_detection = False
 
     def computer_turn(self):
+        player = Utils.Player()
         self.edge_detection = ~self.edge_detection
-        self.process_image()
+        image = self.process_image()
+        r, c = player.next_move(image)
+        print(r, c)
 
     def setConfig(self, config):
         self.usePattern = config['pattern']
@@ -72,9 +75,9 @@ class TicTacToeApp:
     def process_image(self):
         image = self.frame
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('blue', image, 70, False)
+        image = Utils.getColor('red', image, 70, False)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
+        return image
 
     def preprocessimage(self, image):
-
         return image
