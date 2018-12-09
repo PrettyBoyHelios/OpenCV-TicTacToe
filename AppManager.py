@@ -10,13 +10,16 @@ import Utils
 
 
 class TicTacToeApp:
-    def __init__(self, vs, w, h):
+    def __init__(self, vs, w, h, debug=False):
         self.vs = vs
         self.h = h
         self.w = w
+        self.dbg = debug
         self.frame = None
         self.thread = None
         self.stopEvent = None
+        self.isSetUp = False
+        self.coordinates = None
 
         self.root = tk.Tk()
         self.panel = None
@@ -31,11 +34,15 @@ class TicTacToeApp:
         self.edge_detection = False
 
     def computer_turn(self):
-        player = Utils.Player()
-        self.edge_detection = ~self.edge_detection
-        image = self.process_image()
-        r, c = player.next_move(image)
-        print(r, c)
+        if self.isSetUp:
+            self.process_image()
+            player = Utils.Player()
+            image = self.process_image()
+            r, c = player.next_move(image)
+            print(r, c)
+        else:
+            self.coordinates = Utils.getTicTacBoard(self.frame, debug=False)
+            self.isSetUp = True
 
     def setConfig(self, config):
         self.usePattern = config['pattern']
@@ -75,7 +82,9 @@ class TicTacToeApp:
     def process_image(self):
         image = self.frame
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('red', image, 70, False)
+        image = Utils.getColor('red', image, 70, False, self.dbg)
+        image = Utils.warpTicTacToe(image, self.coordinates)
+        image = cv.resize(image, (300,300), interpolation=cv.INTER_LINEAR_EXACT)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
         return image
 
