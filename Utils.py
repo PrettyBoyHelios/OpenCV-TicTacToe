@@ -77,14 +77,16 @@ class Player:
     def generateTicTacToe(self, img):
         ttt = np.chararray((3, 3))
         ttt[:] = 'a'
+        w = 360
+        h = 360
         saw_white = False
         #print(img.shape)
         for i in range(0, 3):
             for j in range(0, 3):
                 cross = 0
                 saw_white = False
-                r = 120 * i + 60
-                for c in range(213 * j, 213 * (j + 1)):
+                r = int(h / 3) * i + int(h / 6)
+                for c in range(int(w / 3) * j, int(w / 3) * (j + 1)):
                     #print(r, c, saw_white)
                     if img[r, c] == 1 and not saw_white:
                         cross += 1
