@@ -36,6 +36,10 @@ class TicTacToeApp:
     def computer_turn(self):
         if self.isSetUp:
             self.process_image()
+            player = Utils.Player()
+            image = self.process_image()
+            r, c = player.next_move(image)
+            print(r, c)
         else:
             self.coordinates = Utils.getTicTacBoard(self.frame, debug=False)
             self.isSetUp = True
@@ -82,6 +86,7 @@ class TicTacToeApp:
         image = Utils.warpTicTacToe(image, self.coordinates)
         image = cv.resize(image, (300,300), interpolation=cv.INTER_LINEAR_EXACT)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
+        return image
 
-        ## Code for computer playing
-
+    def preprocessimage(self, image):
+        return image
