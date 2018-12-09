@@ -8,7 +8,7 @@ from imutils.video import VideoStream
 
 webcam = cv.VideoCapture(0)
 # webcam = VideoStream(0)
-app = TicTacToeApp(webcam, 640, 360)
+app = TicTacToeApp(webcam, 640, 360, debug=True)
 
 app.root.mainloop()
 
