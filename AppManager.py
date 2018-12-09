@@ -35,13 +35,19 @@ class TicTacToeApp:
 
     def computer_turn(self):
         if self.isSetUp:
+            self.img = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
+            self.img = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
+            print(self.coordinates)
             player = Utils.Player()
             image = self.process_image()
             image = Utils.warpTicTacToe(image, self.coordinates)
             r, c = player.next_move(image)
             print(r, c)
         else:
-            self.coordinates = Utils.getTicTacBoard(self.frame, (140, 250), debug=False)
+            self.img = cv.resize(self.img, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
+            #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
+            cv.imshow("Original", self.img)
+            self.coordinates = Utils.getTicTacBoard(self.img, (140, 250), debug=True)
             self.isSetUp = True
 
     def setConfig(self, config):
@@ -54,6 +60,7 @@ class TicTacToeApp:
             while not self.stopEvent.is_set():
                 ret, self.frame = self.vs.read()
                 self.frame = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
+                self.img = self.frame
                 self.frame = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
                 # OpenCV represents images in BGR order transformation to RGB in PIL is required
 
@@ -80,7 +87,7 @@ class TicTacToeApp:
         self.root.destroy()
 
     def process_image(self):
-        image = self.frame
+        image = self.img
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
         image = Utils.getColor('red', image, 70, False, self.dbg)
         image = Utils.warpTicTacToe(image, self.coordinates)

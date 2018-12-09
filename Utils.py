@@ -176,7 +176,7 @@ def getColor(color, or_image, ignore_before, ignore_after, open_image, debug=Fal
     return image
 
 
-def getTicTacBoard(or_image, red_thres, mask_size=10, debug=False):
+def getTicTacBoard(or_image, red_thres, mask_size=5, debug=False):
     image = or_image
     image = getColor('red', image, red_thres[0], red_thres[1], False, debug)
     if debug:
@@ -281,6 +281,7 @@ def warpTicTacToe(image, pts):
     M = cv.getPerspectiveTransform(rect, dst)
     warped = cv.warpPerspective(image, M, (maxWidth, maxHeight))
     # return the warped image
+    warped = cv.resize(image, (360, 360))
     cv.imshow("Warped Image", warped)
     return warped
 
