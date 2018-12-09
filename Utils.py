@@ -127,7 +127,7 @@ class Player:
         return r, c
 
 
-def getColor(color, or_image, ignore_after, open_image, debug=False):
+def getColor(color, or_image, ignore_before, ignore_after, open_image, debug=False):
     image = or_image
     h, w, c = image.shape
 
@@ -139,7 +139,7 @@ def getColor(color, or_image, ignore_after, open_image, debug=False):
 
     eliminating_colors = np.array(eliminating_colors)
     #print(eliminating_colors)
-    image = cv.medianBlur(image, 9)
+    image = cv.medianBlur(image, 5)
     if debug:
         cv.imshow("getColor::Original", image)
     image_r = image
@@ -148,16 +148,17 @@ def getColor(color, or_image, ignore_after, open_image, debug=False):
         for j in range(h):
             n = np.argmax(image_r[j, i])
             if n == colors[color]:
+                if image_r[j, i, colors[color]] < ignore_after and image_r[j, i, colors[color]] > ignore_before:
                     image_r[j, i, colors[color]] = 255
             else:
                 image_r[j, i, colors[color]] = 0
     image_r[:, :, eliminating_colors] = 0
-    cv.imshow("pROCESSED", image_r)
+    cv.imshow("getColor::Processed", image_r)
     imgray = cv.cvtColor(image_r, cv.COLOR_BGR2GRAY) # Image to grayscale
 
-    ret, image = cv.threshold(imgray, ignore_after, 255, cv.THRESH_BINARY) # Image binarization
+    ret, image = cv.threshold(imgray, 50, 255, cv.THRESH_BINARY) # Image binarization
 
-    cv.imshow("Binarized", image)
+    cv.imshow("getColor::Binarized", image)
 
     if open_image:
         # Structuring Element, cross at 45°
@@ -168,13 +169,14 @@ def getColor(color, or_image, ignore_after, open_image, debug=False):
         mask = cv.warpAffine(mask, rot, mask.shape)
         # Open Image
         image = cv.morphologyEx(image, cv.MORPH_OPEN, mask)
-        cv.imshow("getColor Opening Result", image) if debug else None
+        if debug:
+            cv.imshow("getColor::Opening Result", image)
     return image
 
 
-def getTicTacBoard(or_image, mask_size=10, debug=False):
+def getTicTacBoard(or_image, red_thres, mask_size=10, debug=False):
     image = or_image
-    image = getColor('red', image, 70, False)
+    image = getColor('red', image, red_thres[0], red_thres[1], False, debug)
     if debug:
         cv.imshow("getTicTacBoard::Original Image", image)
 
@@ -186,30 +188,31 @@ def getTicTacBoard(or_image, mask_size=10, debug=False):
 
     # Labelling of binary image's components
     num_labels, labels = cv.connectedComponents(image)
-
+    print("num", num_labels)
+    points = np.array([])
     if debug:
         cv.imshow("getTicTacBoard::Labelled Image", labels) if debug else None
-
-    points = getPoints(labels)
+    if num_labels != 1:
+        points = __getPoints(labels)
     print("Points at ", points)
     return points
 
 
-def getPoints(or_image):
+def __getPoints(or_image):
     points = list()
     for i in range(1, 5):
         indexes = np.argwhere(or_image == i)
-        points.append(getPoint(indexes))
+        points.append(__getPoint(indexes))
     points = np.array(points)
     return points
 
 
-def getPoint(label_index):
+def __getPoint(label_index):
     pos = len(label_index)/2
     return label_index[int(pos)]
 
 
-def order_points(pts):
+def __order_points(pts):
     # initialzie a list of coordinates that will be ordered
     # such that the first entry in the list is the top-left,
     # the second entry is the top-right, the third is the
@@ -243,7 +246,7 @@ def warpTicTacToe(image, pts):
     # individually
     print(image.shape)
     cv.imshow("Warp__Image", image)
-    rect = order_points(pts)
+    rect = __order_points(pts)
     print("rect", rect)
     (tl, tr, br, bl) = rect
 
@@ -276,6 +279,7 @@ def warpTicTacToe(image, pts):
     M = cv.getPerspectiveTransform(rect, dst)
     warped = cv.warpPerspective(image, M, (maxWidth, maxHeight))
     # return the warped image
+    cv.imshow("Warped Image", warped)
     return warped
 
 
