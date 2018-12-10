@@ -50,7 +50,7 @@ class TicTacToeApp:
             #image = Utils.getCrossAndCircles(image, self.redMin, self.redMax)
             cv.imshow("TicTacToe::After ProcessImage", image)
             cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", image)
-            r, c = player.next_move(image)
+            r, c, ev = player.next_move(image)
             print("Put a O at: ", r, c)
         else:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)

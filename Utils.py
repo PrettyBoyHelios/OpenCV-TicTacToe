@@ -59,7 +59,7 @@ class Player:
                 return self.INF
             return 1
         elif ev == -1:
-            if level == 2:
+            if level <= 2:
                 return -self.INF
             return -1
 
@@ -79,7 +79,6 @@ class Player:
         ttt[:] = 'a'
         w = 360
         h = 360
-        saw_white = False
         #print(img.shape)
         for i in range(0, 3):
             for j in range(0, 3):
@@ -88,7 +87,7 @@ class Player:
                 r = int(h / 3) * i + int(h / 6)
                 for c in range(int(w / 3) * j, int(w / 3) * (j + 1)):
                     #print(r, c, saw_white)
-                    if img[r, c] == 1 and not saw_white:
+                    if img[r, c] == 255 and not saw_white:
                         cross += 1
                         saw_white = True
                     elif img[r, c] == 0:
@@ -107,26 +106,32 @@ class Player:
         cv.imshow("NextMove::Received Image", img)
 
         tic_tac_toe = self.generateTicTacToe(img)
-
         print(tic_tac_toe)
 
         final_q = -1
 
         r = -1
         c = -1
+        ev = 0
 
         for i in range(0, 3):
             for j in range(0, 3):
                 if tic_tac_toe[i, j] == b'a':
                     tic_tac_toe[i, j] = b'o'
                     q = self.dfs(tic_tac_toe, 1, b'x')
+                    if q >= self.INF:
+                        ev = 1
                     if q > final_q:
                         r = i
                         c = j
                         final_q = q
 
                     tic_tac_toe[i, j] = b'a'
-        return r, c
+
+        if r == -1 and c == -1:
+            ev = -1
+
+        return r, c, ev
 
 
 def getColor(color, or_image, ignore_before, ignore_after, open_image, flip=False, debug=False):
