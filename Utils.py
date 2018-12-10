@@ -129,10 +129,11 @@ class Player:
         return r, c
 
 
-def getColor(color, or_image, ignore_before, ignore_after, open_image, debug=False):
+def getColor(color, or_image, ignore_before, ignore_after, open_image, flip=False, debug=False):
     image = or_image
     h, w, c = image.shape
-
+    if flip:
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     colors = {'blue': 0, 'green': 1, 'red': 2}
     eliminating_colors = list()
     for entry in colors:
@@ -178,7 +179,7 @@ def getColor(color, or_image, ignore_before, ignore_after, open_image, debug=Fal
 
 def getTicTacBoard(or_image, red_thres, mask_size=5, debug=False):
     image = or_image
-    image = getColor('red', image, red_thres[0], red_thres[1], False, debug)
+    image = getColor('red', image, red_thres[0], red_thres[1], False, debug=debug)
     if debug:
         cv.imshow("getTicTacBoard::Original Image", image)
 
@@ -186,14 +187,14 @@ def getTicTacBoard(or_image, red_thres, mask_size=5, debug=False):
     mask = cv.getStructuringElement(cv.MORPH_ELLIPSE, (mask_size, mask_size))  # Structural element, a cross (+)
     image = cv.morphologyEx(image, cv.MORPH_OPEN, mask)
     if debug:
-        cv.imshow("getTicTacBoard::Opened Image", image) if debug else None
+        cv.imshow("getTicTacBoard::Opened Image", image)
 
     # Labelling of binary image's components
     num_labels, labels = cv.connectedComponents(image)
     print("num", num_labels)
     points = np.array([])
-    if debug:
-        cv.imshow("getTicTacBoard::Labelled Image", labels) if debug else None
+    # if debug:
+    #     cv.imshow("getTicTacBoard::Labelled Image", labels)
     if num_labels != 1:
         points = __getPoints(labels)
     print("Points at ", points)
@@ -224,7 +225,7 @@ def __order_points(pts, flag=True):
     # the top-left point will have the smallest sum, whereas
     # the bottom-right point will have the largest sum
     s = pts.sum(axis=1)
-    print("s: ", s)
+    # print("s: ", s)
     rect[0] = pts[np.argmin(s)]
     rect[2] = pts[np.argmax(s)]
 
@@ -232,7 +233,7 @@ def __order_points(pts, flag=True):
     # top-right point will have the smallest difference,
     # whereas the bottom-left will have the largest difference
     diff = np.diff(pts, axis=1)
-    print("d: ", diff)
+    # print("d: ", diff)
     rect[3] = pts[np.argmin(diff)]
     rect[1] = pts[np.argmax(diff)]
 
@@ -250,7 +251,7 @@ def warpTicTacToe(image, pts, flag=True):
     cv.imshow("warpTicTacToe::Received Image to Warp", image)
     rect = pts
     rect = __order_points(pts, flag)
-    print("rect", rect)
+    # print("rect", rect)
     (tl, tr, br, bl) = rect
 
     # compute the width of the new image, which will be the
@@ -287,3 +288,52 @@ def warpTicTacToe(image, pts, flag=True):
     return warped
 
 
+def getCrossAndCircles(image, minRed, maxRed, debug=True):
+    board = np.chararray((3, 3))
+    board[:] = 'a'
+    cv.imshow("CrossAndCircles::ReceivedImage", image)
+    #image = getColor('red', image, minRed, maxRed, False, debug=debug)
+    cross = __get_crosses(image)
+    circles = __get_circles(image)
+
+    new_image = cross + circles
+    cv.imshow("CrossAndCircles::NewImage", new_image)
+
+def __get_crosses(image, mask_size=40, debug=True):
+    mask_size = mask_size
+    mask = cv.getStructuringElement(cv.MORPH_CROSS, (mask_size, mask_size))  # Structural element, a cross (+)
+    rows, cols = mask.shape
+    rot = cv.getRotationMatrix2D((cols / 2, rows / 2), 45, 1)
+    mask = cv.warpAffine(mask, rot, mask.shape)
+    # Open Image
+    aux_image = cv.morphologyEx(image, cv.MORPH_OPEN, mask)
+    if debug:
+        cv.imshow("CrossAndCircles::Opening Result", image)
+
+    num_labels, labels = cv.connectedComponents(aux_image)
+    print(num_labels)
+
+
+    return aux_image
+
+def __get_circles(image, debug=True):
+    # detect circles in the image
+    output = image.copy()
+    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, 1.2, 10, param_1 = 255)
+
+    # ensure at least some circles were found
+    if circles is not None:
+        # convert the (x, y) coordinates and radius of the circles to integers
+        circles = np.round(circles[0, :]).astype("int")
+        print(circles)
+
+        # loop over the (x, y) coordinates and radius of the circles
+        for (x, y, r) in circles:
+            # draw the circle in the output image, then draw a rectangle
+            # corresponding to the center of the circle
+            cv.circle(output, (x, y), r, (0, 255, 0), 4)
+            cv.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+
+        # show the output image
+        cv.imshow("output", np.hstack([image, output]))
+    return circles

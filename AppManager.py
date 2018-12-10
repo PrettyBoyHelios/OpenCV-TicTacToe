@@ -20,6 +20,8 @@ class TicTacToeApp:
         self.stopEvent = None
         self.isSetUp = False
         self.coordinates = None
+        self.redMin = 50
+        self.redMax = 254
 
         self.root = tk.Tk()
         self.panel = None
@@ -35,8 +37,9 @@ class TicTacToeApp:
 
     def computer_turn(self):
         if self.isSetUp:
-            self.img = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-            self.img = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
+            self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
+            self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
+            cv.imshow("TicTacToe::Image", self.img)
             print("Coordinates", self.coordinates)
             player = Utils.Player()
             #image = self.process_image()
@@ -44,13 +47,17 @@ class TicTacToeApp:
             image = self.process_image(image)
             cv.imshow("TicTacToe::After ProcessImage", image)
             image = Utils.warpTicTacToe(image, self.coordinates, True)
+            #image = Utils.getCrossAndCircles(image, self.redMin, self.redMax)
+            cv.imshow("TicTacToe::After ProcessImage", image)
+            cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", image)
             r, c = player.next_move(image)
             print("Put a O at: ", r, c)
         else:
-            self.img = cv.resize(self.img, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
+            self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
+            self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
             #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
             cv.imshow("Original", self.img)
-            self.coordinates = Utils.getTicTacBoard(self.img, (140, 250), debug=True)
+            self.coordinates = Utils.getTicTacBoard(self.img, (self.redMin, self.redMax), debug=True)
             self.isSetUp = True
 
     def setConfig(self, config):
@@ -62,8 +69,8 @@ class TicTacToeApp:
             # keep looping over frames until we are instructed to stop
             while not self.stopEvent.is_set():
                 ret, self.frame = self.vs.read()
-                self.frame = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
-                self.img = self.frame
+                self.frame = cv.resize(self.frame, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
+                self.img = self.frame.copy()
                 self.frame = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
                 # OpenCV represents images in BGR order transformation to RGB in PIL is required
 
@@ -91,9 +98,12 @@ class TicTacToeApp:
 
     def process_image(self, image):
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('red', image, 70, False, self.dbg)
-        cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
+        image = Utils.getColor('red', image, self.redMin, self.redMax, False, flip=True, debug=self.dbg)
         return image
 
+
+    def set_red_calibration(self, minRed, maxRed):
+        self.redMin = minRed
+        self.redMax = maxRed
     def preprocessimage(self, image):
         return image
