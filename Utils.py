@@ -104,7 +104,7 @@ class Player:
         return ttt
 
     def next_move(self, img):
-        cv.imshow("cosa", img)
+        cv.imshow("NextMove::Received Image", img)
 
         tic_tac_toe = self.generateTicTacToe(img)
 
@@ -214,7 +214,7 @@ def __getPoint(label_index):
     return label_index[int(pos)]
 
 
-def __order_points(pts):
+def __order_points(pts, flag=True):
     # initialzie a list of coordinates that will be ordered
     # such that the first entry in the list is the top-left,
     # the second entry is the top-right, the third is the
@@ -238,17 +238,18 @@ def __order_points(pts):
 
     # For some reason x and y are inverted, this flips the array
     order = np.array([1, 0])
-    rect = rect[:, order]
+    if flag:
+        rect = rect[:, order]
     # return the ordered coordinates
     return rect
 
 
-def warpTicTacToe(image, pts):
+def warpTicTacToe(image, pts, flag=True):
     # obtain a consistent order of the points and unpack them
     # individually
-    print(image.shape)
-    cv.imshow("Warp__Image", image)
-    rect = __order_points(pts)
+    cv.imshow("warpTicTacToe::Received Image to Warp", image)
+    rect = pts
+    rect = __order_points(pts, flag)
     print("rect", rect)
     (tl, tr, br, bl) = rect
 
@@ -281,8 +282,8 @@ def warpTicTacToe(image, pts):
     M = cv.getPerspectiveTransform(rect, dst)
     warped = cv.warpPerspective(image, M, (maxWidth, maxHeight))
     # return the warped image
-    warped = cv.resize(image, (360, 360))
-    cv.imshow("Warped Image", warped)
+    warped = cv.resize(warped, (360, 360))
+    cv.imshow("warpTicTacToe::Warped Image", warped)
     return warped
 
 

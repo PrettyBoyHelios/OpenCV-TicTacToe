@@ -37,12 +37,15 @@ class TicTacToeApp:
         if self.isSetUp:
             self.img = cv.resize(self.frame, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
             self.img = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
-            print(self.coordinates)
+            print("Coordinates", self.coordinates)
             player = Utils.Player()
-            image = self.process_image()
-            image = Utils.warpTicTacToe(image, self.coordinates)
+            #image = self.process_image()
+            image = self.img
+            image = self.process_image(image)
+            cv.imshow("TicTacToe::After ProcessImage", image)
+            image = Utils.warpTicTacToe(image, self.coordinates, True)
             r, c = player.next_move(image)
-            print(r, c)
+            print("Put a O at: ", r, c)
         else:
             self.img = cv.resize(self.img, (640, 360), interpolation=cv.INTER_LINEAR_EXACT)
             #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
@@ -86,12 +89,9 @@ class TicTacToeApp:
         cv.destroyAllWindows()
         self.root.destroy()
 
-    def process_image(self):
-        image = self.img
+    def process_image(self, image):
         image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
         image = Utils.getColor('red', image, 70, False, self.dbg)
-        image = Utils.warpTicTacToe(image, self.coordinates)
-        image = cv.resize(image, (300,300), interpolation=cv.INTER_LINEAR_EXACT)
         cv.imwrite("images/lol" + str(datetime.datetime.now())+".png", image)
         return image
 
