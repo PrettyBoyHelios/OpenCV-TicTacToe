@@ -62,18 +62,19 @@ class TicTacToeApp:
 
             if self.dbg:
                 cv.imshow("TicTacToe::After ProcessImage", image)
-                cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", image)
+                cv.imwrite("images/" + str(datetime.datetime.now()) + ".png", image)
             r, c, ev = player.next_move(image)
             if ev == 0:
                 string = "Please, put an 'O' at (r, c) (" + str(r+1) + ", " + str(c+1) + "), make your move, and then click the button again!"
                 self.current_message.set(string)
             elif ev == 1:
-                self.current_message.set("You won! :C")
+                string = "Please, put an 'O' at (r, c) (" + str(r+1) + ", " + str(c+1) + "). I won! :)"
+                self.current_message.set(string)
             elif ev == -1:
                 self.current_message.set("I won! Good game!")
         else:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
-            self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
+            #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
             #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
             if self.dbg:
                 cv.imshow("Original", self.img)

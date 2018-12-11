@@ -102,8 +102,9 @@ class Player:
 
         return ttt
 
-    def next_move(self, img):
-        cv.imshow("NextMove::Received Image", img)
+    def next_move(self, img, debug=False):
+        if debug:
+            cv.imshow("NextMove::Received Image", img)
 
         tic_tac_toe = self.generateTicTacToe(img)
         print("Board\n", tic_tac_toe)
@@ -161,12 +162,14 @@ def getColor(color, or_image, ignore_before, ignore_after, open_image, flip=Fals
             else:
                 image_r[j, i, colors[color]] = 0
     image_r[:, :, eliminating_colors] = 0
-    cv.imshow("getColor::Processed", image_r)
+    if debug:
+        cv.imshow("getColor::Processed", image_r)
     imgray = cv.cvtColor(image_r, cv.COLOR_BGR2GRAY) # Image to grayscale
 
     ret, image = cv.threshold(imgray, 50, 255, cv.THRESH_BINARY) # Image binarization
 
-    cv.imshow("getColor::Binarized", image)
+    if debug:
+        cv.imshow("getColor::Binarized", image)
 
     if open_image:
         # Structuring Element, cross at 45°
@@ -295,50 +298,50 @@ def warpTicTacToe(image, pts, flag=True, debug=False):
     return warped
 
 
-def getCrossAndCircles(image, minRed, maxRed, debug=True):
-    board = np.chararray((3, 3))
-    board[:] = 'a'
-    cv.imshow("CrossAndCircles::ReceivedImage", image)
-    #image = getColor('red', image, minRed, maxRed, False, debug=debug)
-    cross = __get_crosses(image)
-    circles = __get_circles(image)
+# def getCrossAndCircles(image, minRed, maxRed, debug=True):
+#     board = np.chararray((3, 3))
+#     board[:] = 'a'
+#     cv.imshow("CrossAndCircles::ReceivedImage", image)
+#     #image = getColor('red', image, minRed, maxRed, False, debug=debug)
+#     cross = __get_crosses(image)
+#     circles = __get_circles(image)
+#
+#     new_image = cross + circles
+#     cv.imshow("CrossAndCircles::NewImage", new_image)
 
-    new_image = cross + circles
-    cv.imshow("CrossAndCircles::NewImage", new_image)
-
-def __get_crosses(image, mask_size=40, debug=True):
-    mask_size = mask_size
-    mask = cv.getStructuringElement(cv.MORPH_CROSS, (mask_size, mask_size))  # Structural element, a cross (+)
-    rows, cols = mask.shape
-    rot = cv.getRotationMatrix2D((cols / 2, rows / 2), 45, 1)
-    mask = cv.warpAffine(mask, rot, mask.shape)
-    # Open Image
-    aux_image = cv.morphologyEx(image, cv.MORPH_OPEN, mask)
-    if debug:
-        cv.imshow("CrossAndCircles::Opening Result", image)
-
-    num_labels, labels = cv.connectedComponents(aux_image)
-    #print(num_labels)
-    return aux_image
-
-def __get_circles(image, debug=True):
-    # detect circles in the image
-    output = image.copy()
-    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, 1.2, 10, param_1 = 255)
-
-    # ensure at least some circles were found
-    if circles is not None:
-        # convert the (x, y) coordinates and radius of the circles to integers
-        circles = np.round(circles[0, :]).astype("int")
-        #print(circles)
-
-        # loop over the (x, y) coordinates and radius of the circles
-        for (x, y, r) in circles:
-            # draw the circle in the output image, then draw a rectangle
-            # corresponding to the center of the circle
-            cv.circle(output, (x, y), r, (0, 255, 0), 4)
-            cv.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-
-        # show the output image
-        cv.imshow("output", np.hstack([image, output]))
-    return circles
+# def __get_crosses(image, mask_size=40, debug=True):
+#     mask_size = mask_size
+#     mask = cv.getStructuringElement(cv.MORPH_CROSS, (mask_size, mask_size))  # Structural element, a cross (+)
+#     rows, cols = mask.shape
+#     rot = cv.getRotationMatrix2D((cols / 2, rows / 2), 45, 1)
+#     mask = cv.warpAffine(mask, rot, mask.shape)
+#     # Open Image
+#     aux_image = cv.morphologyEx(image, cv.MORPH_OPEN, mask)
+#     if debug:
+#         cv.imshow("CrossAndCircles::Opening Result", image)
+#
+#     num_labels, labels = cv.connectedComponents(aux_image)
+#     #print(num_labels)
+#     return aux_image
+#
+# def __get_circles(image, debug=True):
+#     # detect circles in the image
+#     output = image.copy()
+#     circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, 1.2, 10, param_1 = 255)
+#
+#     # ensure at least some circles were found
+#     if circles is not None:
+#         # convert the (x, y) coordinates and radius of the circles to integers
+#         circles = np.round(circles[0, :]).astype("int")
+#         #print(circles)
+#
+#         # loop over the (x, y) coordinates and radius of the circles
+#         for (x, y, r) in circles:
+#             # draw the circle in the output image, then draw a rectangle
+#             # corresponding to the center of the circle
+#             cv.circle(output, (x, y), r, (0, 255, 0), 4)
+#             cv.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+#
+#         # show the output image
+#         cv.imshow("output", np.hstack([image, output]))
+#     return circles
