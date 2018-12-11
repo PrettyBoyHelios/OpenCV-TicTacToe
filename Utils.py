@@ -106,7 +106,7 @@ class Player:
         cv.imshow("NextMove::Received Image", img)
 
         tic_tac_toe = self.generateTicTacToe(img)
-        print(tic_tac_toe)
+        print("Board\n", tic_tac_toe)
 
         final_q = -1
 
@@ -196,13 +196,13 @@ def getTicTacBoard(or_image, red_thres, mask_size=5, debug=False):
 
     # Labelling of binary image's components
     num_labels, labels = cv.connectedComponents(image)
-    print("num", num_labels)
+    #print("num", num_labels)
     points = np.array([])
     # if debug:
     #     cv.imshow("getTicTacBoard::Labelled Image", labels)
     if num_labels != 1:
         points = __getPoints(labels)
-    print("Points at ", points)
+    #print("Points at ", points)
     return points
 
 
@@ -250,10 +250,11 @@ def __order_points(pts, flag=True):
     return rect
 
 
-def warpTicTacToe(image, pts, flag=True):
+def warpTicTacToe(image, pts, flag=True, debug=False):
     # obtain a consistent order of the points and unpack them
     # individually
-    cv.imshow("warpTicTacToe::Received Image to Warp", image)
+    if debug:
+        cv.imshow("warpTicTacToe::Received Image to Warp", image)
     rect = pts
     rect = __order_points(pts, flag)
     # print("rect", rect)
@@ -289,7 +290,8 @@ def warpTicTacToe(image, pts, flag=True):
     warped = cv.warpPerspective(image, M, (maxWidth, maxHeight))
     # return the warped image
     warped = cv.resize(warped, (360, 360))
-    cv.imshow("warpTicTacToe::Warped Image", warped)
+    if debug:
+        cv.imshow("warpTicTacToe::Warped Image", warped)
     return warped
 
 
@@ -316,9 +318,7 @@ def __get_crosses(image, mask_size=40, debug=True):
         cv.imshow("CrossAndCircles::Opening Result", image)
 
     num_labels, labels = cv.connectedComponents(aux_image)
-    print(num_labels)
-
-
+    #print(num_labels)
     return aux_image
 
 def __get_circles(image, debug=True):
@@ -330,7 +330,7 @@ def __get_circles(image, debug=True):
     if circles is not None:
         # convert the (x, y) coordinates and radius of the circles to integers
         circles = np.round(circles[0, :]).astype("int")
-        print(circles)
+        #print(circles)
 
         # loop over the (x, y) coordinates and radius of the circles
         for (x, y, r) in circles:

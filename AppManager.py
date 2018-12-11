@@ -7,6 +7,7 @@ from PIL import Image, ImageTk
 import traceback
 import datetime
 import Utils
+from tkinter import StringVar
 
 
 class TicTacToeApp:
@@ -22,11 +23,20 @@ class TicTacToeApp:
         self.coordinates = None
         self.redMin = 50
         self.redMax = 254
+        self.current_state = 0
+
+
+        self.isFirstTurn = False
 
         self.root = tk.Tk()
+        self.current_message = StringVar()
         self.panel = None
         btn = tk.Button(self.root, text="PC Turn!", command=self.computer_turn)
         btn.pack(side="bottom", fill="both", expand="no", padx=10, pady=10)
+        msg_label = tk.Label(self.root, textvariable=self.current_message)
+        msg_label.pack(side="bottom", fill="both", expand="no", padx=10, pady=10)
+
+        self.current_message.set("Please, press the \"PC Turn!\" button when the board is blank to calibrate the board.")
 
         self.stopEvent = threading.Event()
         self.thread = threading.Thread(target=self.videoLoop, args=())
@@ -38,31 +48,41 @@ class TicTacToeApp:
     def computer_turn(self):
         if self.isSetUp:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
-            self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
-            cv.imshow("TicTacToe::Image", self.img)
-            print("Coordinates", self.coordinates)
+            #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
+            if self.dbg:
+                cv.imshow("TicTacToe::Image", self.img)
+                print("Coordinates", self.coordinates)
             player = Utils.Player()
-            #image = self.process_image()
             image = self.img
             image = self.process_image(image)
-            cv.imshow("TicTacToe::After ProcessImage", image)
-            image = Utils.warpTicTacToe(image, self.coordinates, True)
-            #image = Utils.getCrossAndCircles(image, self.redMin, self.redMax)
-            cv.imshow("TicTacToe::After ProcessImage", image)
-            cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", image)
+
+            if self.dbg:
+                cv.imshow("TicTacToe::After ProcessImage", image)
+            image = Utils.warpTicTacToe(image, self.coordinates, True, debug=self.dbg)
+
+            if self.dbg:
+                cv.imshow("TicTacToe::After ProcessImage", image)
+                cv.imwrite("images/lol" + str(datetime.datetime.now()) + ".png", image)
             r, c, ev = player.next_move(image)
-            print("Put a O at: ", r, c)
+            if ev == 0:
+                string = "Please, put an 'O' at (r, c) (" + str(r+1) + ", " + str(c+1) + "), make your move, and then click the button again!"
+                self.current_message.set(string)
+            elif ev == 1:
+                self.current_message.set("You won! :C")
+            elif ev == -1:
+                self.current_message.set("I won! Good game!")
         else:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
             self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
             #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
-            cv.imshow("Original", self.img)
-            self.coordinates = Utils.getTicTacBoard(self.img, (self.redMin, self.redMax), debug=True)
+            if self.dbg:
+                cv.imshow("Original", self.img)
+            self.coordinates = Utils.getTicTacBoard(self.img, (self.redMin, self.redMax), debug=self.dbg)
             self.isSetUp = True
+            self.current_message.set("Put your 'X' in the board and press to play!")
 
     def setConfig(self, config):
         self.usePattern = config['pattern']
-
 
     def videoLoop(self):
         try:
