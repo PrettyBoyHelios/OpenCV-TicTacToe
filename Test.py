@@ -1,8 +1,5 @@
 import tkinter as tk
 import cv2 as cv
-import numpy as np
-from AppManager import TicTacToeApp
-from PIL import Image, ImageTk
 import Utils
 import traceback
 
