@@ -49,10 +49,11 @@ class TicTacToeApp:
     def computer_turn(self):
         if self.isSetUp:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
-            #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
+
             if self.dbg:
                 cv.imshow("TicTacToe::Image", self.img)
                 print("Coordinates", self.coordinates)
+
             player = Utils.Player()
             image = self.img
             image = self.process_image(image)
@@ -64,21 +65,15 @@ class TicTacToeApp:
             if self.dbg:
                 cv.imshow("TicTacToe::After ProcessImage", image)
                 cv.imwrite("images/" + str(datetime.datetime.now()) + ".png", image)
+
             r, c, ev = player.next_move(image)
-            if ev == 0:
-                string = "Please, put an 'O' at (r, c) (" + str(r+1) + ", " + str(c+1) + "), make your move, and then click the button again!"
-                self.current_message.set(string)
-            elif ev == 1:
-                string = "Please, put an 'O' at (r, c) (" + str(r+1) + ", " + str(c+1) + "). I won! :)"
-                self.current_message.set(string)
-            elif ev == -1:
-                self.current_message.set("You won! Good game!")
+            self.set_label_text(ev, r, c)
         else:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
-            #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
-            #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
+
             if self.dbg:
                 cv.imshow("Original", self.img)
+
             self.coordinates = Utils.getTicTacBoard(self.img, (self.redMin, self.redMax), debug=self.dbg)
             self.isSetUp = True
             self.current_message.set("Put your 'X' in the board and press to play!")
@@ -118,14 +113,17 @@ class TicTacToeApp:
         cv.destroyAllWindows()
         self.root.destroy()
 
-    def process_image(self, image):
-        image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
-        image = Utils.getColor('red', image, self.redMin, self.redMax, False, flip=True, debug=self.dbg)
-        return image
-
-
     def set_red_calibration(self, minRed, maxRed):
         self.redMin = minRed
         self.redMax = maxRed
-    def preprocessimage(self, image):
-        return image
+
+    def set_label_text(self, ev, r, c):
+        if ev == 0:
+            string = "Please, put an 'O' at (r, c) (" + str(r + 1) + ", " + str(
+                c + 1) + "), make your move, and then click the button again!"
+            self.current_message.set(string)
+        elif ev == 1:
+            string = "Please, put an 'O' at (r, c) (" + str(r + 1) + ", " + str(c + 1) + "). I won! :)"
+            self.current_message.set(string)
+        elif ev == -1:
+            self.current_message.set("You won! Good game!")
