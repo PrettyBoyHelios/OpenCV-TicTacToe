@@ -11,10 +11,11 @@ from tkinter import StringVar
 
 
 class TicTacToeApp:
-    def __init__(self, vs, w, h, debug=False):
+    #def __init__(self, vs, w, h, debug=False):
+    def __init__(self, vs, dimensions, debug=False):
         self.vs = vs
-        self.h = h
-        self.w = w
+        self.h = dimensions[1]
+        self.w = dimensions[0]
         self.dbg = debug
         self.frame = None
         self.thread = None

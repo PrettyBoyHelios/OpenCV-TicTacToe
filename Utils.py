@@ -1,7 +1,5 @@
-import tkinter as tk
 import cv2 as cv
 import numpy as np
-from PIL import Image, ImageTk
 
 
 class Player:
