@@ -71,3 +71,6 @@ fabric.properties
 *.xml
 *.iml
 *.png
+
+# Files
+Test.py
