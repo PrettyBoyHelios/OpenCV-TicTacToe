@@ -71,7 +71,7 @@ class TicTacToeApp:
                 string = "Please, put an 'O' at (r, c) (" + str(r+1) + ", " + str(c+1) + "). I won! :)"
                 self.current_message.set(string)
             elif ev == -1:
-                self.current_message.set("I won! Good game!")
+                self.current_message.set("You won! Good game!")
         else:
             self.img = cv.resize(self.img, (self.w, self.h), interpolation=cv.INTER_LINEAR_EXACT)
             #self.img = cv.cvtColor(self.img, cv.COLOR_BGR2RGB)
