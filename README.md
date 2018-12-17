@@ -38,3 +38,5 @@ The board can be any size, but an optimal gameplay experience is reached when it
 The first move is always set to calibrate the TicTaeToe board. A static setup for the board and camera is needed.  
 
 ### Setup
+
+

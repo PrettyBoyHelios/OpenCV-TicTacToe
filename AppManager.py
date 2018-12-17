@@ -127,3 +127,8 @@ class TicTacToeApp:
             self.current_message.set(string)
         elif ev == -1:
             self.current_message.set("You won! Good game!")
+
+    def process_image(self, image):
+        image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+        image = Utils.getColor('red', image, self.redMin, self.redMax, False, flip=True, debug=self.dbg)
+        return image
